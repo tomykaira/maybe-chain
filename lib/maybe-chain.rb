@@ -49,6 +49,15 @@ module MaybeChain
         @obj
       end
     end
+
+    def lift(method_name, *args, &block)
+      if nothing?
+        MaybeWrapper.new(Nothing.instance, @rescuables)
+      else
+        extracts = args.map {|arg| arg.is_a?(MaybeChain::MaybeWrapper) ? arg.value : arg}
+        MaybeWrapper.new(value.__send__(method_name, *extracts, &block))
+      end
+    end
   end
 
   class Nothing
